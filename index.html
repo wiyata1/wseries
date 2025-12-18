@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dailymotion Playlist desde Sheets</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: Arial;
+}
+#list a {
+  display: block;
+  padding: 12px;
+  border-bottom: 1px solid #444;
+  color: white;
+  text-decoration: none;
+}
+iframe {
+  width: 100%;
+  height: 50vh;
+  border: 0;
+}
+</style>
+</head>
+
+<body>
+
+<div id="list">Cargando lista...</div>
+
+<iframe id="player" allowfullscreen webkitallowfullscreen></iframe>
+
+<script>
+// URL DEL CSV DE GOOGLE SHEETS
+var SHEET_CSV =
+'https://docs.google.com/spreadsheets/d/e/2PACX-1vRMQ57z3YKiInRARJk1hbw2tsaa6vM4074Pnw3T08GdL-DGtOuY-yhjgJxq_iCVMGMbDJvqiz8qfwY7/pub?gid=467389284&single=true&output=csv';
+
+// COLUMNA C = índice 2
+var COL_URL = 2;
+
+function loadList() {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', SHEET_CSV, true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      renderList(xhr.responseText);
+    }
+  };
+  xhr.send(null);
+}
+
+function renderList(csv) {
+  var lines = csv.split('\n');
+  var html = '';
+
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].replace(/\r/g, '').trim();
+    if (!line) continue;
+
+    var cols = line.split(',');
+    if (cols.length <= COL_URL) continue;
+
+    var url = cols[COL_URL].trim();
+    if (!url) continue;
+
+    html +=
+      '<a href="javascript:void(0)" onclick="play(\'' + url + '\')">' +
+      'Playlist ' + (i + 1) +
+      '</a>';
+  }
+
+  document.getElementById('list').innerHTML =
+    html || 'No hay playlists';
+}
+
+function play(url) {
+  // Convertir URL normal a URL embed
+  var embed = url.replace(
+    'https://www.dailymotion.com/',
+    'https://www.dailymotion.com/embed/'
+  );
+
+  document.getElementById('player').src = embed;
+}
+
+// Cargar al abrir
+loadList();
+</script>
+
+</body>
+</html>
