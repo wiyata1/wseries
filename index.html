@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dailymotion Playlist (iPhone 4S)</title>
+<title>Dailymotion Playlist Sheets</title>
 
 <style>
 body {
@@ -35,18 +35,18 @@ iframe {
 
 <script>
 // ===============================
-// GOOGLE SHEETS (JSONP - iOS 6)
+// GOOGLE SHEETS (GVIZ + JSONP)
 // ===============================
-var SHEET_JSON =
-'https://docs.google.com/spreadsheets/d/e/2PACX-1vRMQ57z3YKiInRARJk1hbw2tsaa6vM4074Pnw3T08GdL-DGtOuY-yhjgJxq_iCVMGMbDJvqiz8qfwY7/gviz/tq?tqx=out:json';
+var SHEET_GVIZ =
+'https://docs.google.com/spreadsheets/d/2PACX-1vRMQ57z3YKiInRARJk1hbw2tsaa6vM4074Pnw3T08GdL-DGtOuY-yhjgJxq_iCVMGMbDJvqiz8qfwY7/gviz/tq?gid=467389284';
 
-// Columna C (A=0, B=1, C=2)
+// Columna C = índice 2
 var COL_URL = 2;
 
 // ===============================
-// CALLBACK JSONP
+// CALLBACK
 // ===============================
-function googleCallback(data) {
+function sheetLoaded(data) {
   if (!data || !data.table || !data.table.rows) {
     document.getElementById('list').innerHTML =
       'Error al cargar lista';
@@ -76,12 +76,13 @@ function googleCallback(data) {
 // ===============================
 (function () {
   var s = document.createElement('script');
-  s.src = SHEET_JSON + '&tqx=responseHandler:googleCallback';
+  s.src = SHEET_GVIZ +
+    '&tqx=responseHandler:sheetLoaded';
   document.body.appendChild(s);
 })();
 
 // ===============================
-// REPRODUCIR PLAYLIST
+// PLAYLIST
 // ===============================
 function play(url) {
   var embed = url.replace(
