@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dailymotion Playlist</title>
+<title>Dailymotion Player</title>
 
 <style>
 html, body {
@@ -14,7 +14,7 @@ html, body {
   height: 100%;
 }
 
-#player {
+iframe {
   width: 100%;
   height: 100%;
   border: 0;
@@ -33,39 +33,34 @@ html, body {
 <script>
 (function () {
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'playlist.txt', true);
+  var videos = [];
+  var index = 0;
 
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-
-        var text = xhr.responseText.replace(/\r/g, '').trim();
-        var lines = text.split('\n');
-
-        if (lines.length === 0 || lines[0] === '') {
-          alert('Playlist vacía');
-          return;
-        }
-
-        // Tomamos la PRIMERA playlist
-        var url = lines[0].trim();
-
-        // Extraer ID
-        var parts = url.split('/');
-        var playlistId = parts[parts.length - 1];
-
-        // Cargar playlist
-        document.getElementById('player').src =
-          'https://www.dailymotion.com/embed/video/' + playlistId;
-
-      } else {
-        alert('No se pudo cargar playlist.txt');
+  function loadList() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'playlist.txt', true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        videos = xhr.responseText
+          .replace(/\r/g, '')
+          .split('\n');
+        play();
       }
-    }
-  };
+    };
+    xhr.send(null);
+  }
 
-  xhr.send(null);
+  function play() {
+    if (!videos[index]) return;
+
+    var id = videos[index].trim();
+    if (!id) return;
+
+    document.getElementById('player').src =
+      'https://www.dailymotion.com/embed/video/' + id;
+  }
+
+  loadList();
 
 })();
 </script>
